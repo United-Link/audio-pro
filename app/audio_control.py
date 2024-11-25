@@ -223,7 +223,8 @@ def restart_services():
 
         subprocess.run(
             [
-                "docker compose",
+                "docker",
+                "compose",
                 "-f",
                 COMPOSE_FILE,
                 "down",
@@ -234,7 +235,8 @@ def restart_services():
 
         subprocess.run(
             [
-                "docker compose",
+                "docker",
+                "compose",
                 "-f",
                 COMPOSE_FILE,
                 "up",

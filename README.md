@@ -48,7 +48,7 @@ docker run --name audio-ctl --rm -it \
 -v /run/user/1000/pulse:/run/user/1000/pulse \
 -e PULSE_SERVER=unix:/run/user/1000/pulse/native \
 -v /var/run/docker.sock:/var/run/docker.sock \
--v /mnt/audio-pro/docker-comose_services.yaml:/usr/src/app/docker-comose_services.yaml \
+-v ~/audio-pro/docker-comose_services.yaml:/usr/src/app/docker-comose_services.yaml \
 -p 5003:5003 \
 audio-ctl bash
 
