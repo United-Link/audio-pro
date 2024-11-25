@@ -128,8 +128,10 @@ def check_audio_enh():
         else:
             raise Exception("No State")
     except subprocess.CalledProcessError:
+        print("CalledProcessError")
         return False, None
     except json.JSONDecodeError:
+        print("JSONDecodeError")
         return False, None
     except Exception:
         return False, None
