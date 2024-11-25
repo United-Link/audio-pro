@@ -35,6 +35,16 @@ audio-vol python volume_monitor.py
 ```bash
 docker buildx build -f Dockerfile_ctl -t audio-ctl .
 
+docker run --name audio-ctl --rm -it \
+--device /dev/bus/usb:/dev/bus/usb \
+-v /run/user/$(id -u)/pulse:/run/user/$(id -u)/pulse \
+-e PULSE_SERVER=unix:/run/user/$(id -u)/pulse/native \
+-v /var/run/docker.sock:/var/run/docker.sock \
+-v /mnt/audio/NorthAudio/space/run_dfn_n_vol.yaml:/mnt/audio/NorthAudio/space/run_dfn_n_vol.yaml \
+-p 5003:5003 \
+audio-ctl bash
+
+
 docker run -d --name audio-ctl -it \
 --device /dev/bus/usb:/dev/bus/usb \
 -v /run/user/$(id -u)/pulse:/run/user/$(id -u)/pulse \

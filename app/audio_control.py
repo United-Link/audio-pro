@@ -123,7 +123,21 @@ def check_audio_enh():
         if "Up" not in audio_enh_status:
             return False, None
 
-        match = re.search(r"bash audio_enhance.sh (\d+)", audio_enh_status)
+        audio_enh_command = subprocess.run(
+            [
+                "docker",
+                "ps",
+                "-a",
+                "--filter",
+                "name=audio-enh",
+                "--format",
+                "{{.Command}}",
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+        match = re.search(r"bash run_dfn.sh (\d+)", audio_enh_command)
         if match:
             parameter = int(match.group(1))
             return True, parameter
