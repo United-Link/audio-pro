@@ -65,7 +65,7 @@ def set_volume_levels(device, kind: str):
 
     try:
         subprocess.run(
-            ["pactl", commmand, device, "100"],
+            ["pactl", commmand, device, "100%"],
             capture_output=True,
             text=True,
             check=True,
@@ -85,7 +85,7 @@ def check_audio_vol():
                 "ps",
                 "-a",
                 "--filter",
-                "name=audio_api",
+                "name=audio-vol",
                 "--format",
                 "{{.Status}}",
             ],
@@ -111,7 +111,7 @@ def check_audio_enh():
                 "ps",
                 "-a",
                 "--filter",
-                "name=audio_enh",
+                "name=audio-enh",
                 "--format",
                 "{{.Status}}",
             ],
@@ -123,21 +123,7 @@ def check_audio_enh():
         if "Up" not in audio_enh_status:
             return False, None
 
-        audio_enh_command = subprocess.run(
-            [
-                "docker",
-                "ps",
-                "-a",
-                "--filter",
-                "name=audio_enh",
-                "--format",
-                "{{.Command}}",
-            ],
-            capture_output=True,
-            text=True,
-            check=True,
-        ).stdout.strip()
-        match = re.search(r"bash run_dfn.sh (\d+)", audio_enh_command)
+        match = re.search(r"bash audio_enhance.sh (\d+)", audio_enh_status)
         if match:
             parameter = int(match.group(1))
             return True, parameter
