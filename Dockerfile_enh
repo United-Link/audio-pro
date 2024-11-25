@@ -1,0 +1,51 @@
+# 使用 Ubuntu 作為基礎映像檔
+FROM ubuntu:22.04
+
+# 避免在安裝過程中出現互動式提示
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 更新套件列表並安裝必要的套件
+RUN apt-get update && apt-get install -y \
+    pipewire \
+    pipewire-audio-client-libraries \
+    pipewire-pulse \
+    wireplumber \
+    dbus \
+    systemd \
+    && rm -rf /var/lib/apt/lists/*
+
+# 建立必要的目錄
+RUN mkdir -p /run/user/1000
+
+# 設定環境變數
+ENV XDG_RUNTIME_DIR=/run/user/1000
+ENV PULSE_SERVER=unix:/run/user/1000/pulse/native
+
+# 建立一個非 root 使用者
+RUN useradd -m -u 1000 user
+RUN chown -R user:user /run/user/1000
+
+# 切換到非 root 使用者
+USER user
+
+# 設定工作目錄
+WORKDIR /home/user
+
+# 建立啟動腳本
+RUN echo '#!/bin/bash\n\
+dbus-daemon --session --address=unix:path=/run/user/1000/bus --nofork --nopidfile &\n\
+sleep 2\n\
+pipewire &\n\
+sleep 2\n\
+pipewire-pulse &\n\
+sleep 2\n\
+wireplumber &\n\
+sleep 2\n\
+exec "$@"' > /home/user/entrypoint.sh && \
+    chmod +x /home/user/entrypoint.sh
+
+# 設定 ENTRYPOINT
+ENTRYPOINT ["/home/user/entrypoint.sh"]
+
+# 預設指令
+CMD ["bash"]

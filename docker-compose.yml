@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  audio_ctl:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: audio_ctl:latest
+    container_name: audio_ctl
+    command: python app.py
+    ports:
+      - "9527:9527"
+    devices:
+      - /dev/bus/usb:/dev/bus/usb
+    volumes:
+      - /run/user/${UID}/pulse:/run/user/${UID}/pulse
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /mnt/audio/NorthAudio/space/run_dfn_n_vol.yaml:/mnt/audio/NorthAudio/space/run_dfn_n_vol.yaml
+    environment:
+      - PULSE_SERVER=unix:/run/user/${UID}/pulse/native
+    restart: unless-stopped
