@@ -27,4 +27,4 @@ RUN curl -L "https://github.com/docker/compose/releases/latest/download/docker-c
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY audio_control.py .
+COPY ./app/audio_control.py .

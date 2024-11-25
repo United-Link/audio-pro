@@ -31,3 +31,7 @@ docker run -it --rm \
 audio-vol bash
 
 ```
+
+```bash
+docker buildx build -f Dockerfile_ctl -t audio-ctl .
+```
