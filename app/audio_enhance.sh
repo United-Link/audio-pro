@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Check if an argument is provided
-if [ "$#" -ne 1 ]; then
+if [ "$#" -ne 2 ]; then
     echo "Usage: $0 <attenuation_limit>"
     exit 1
 fi

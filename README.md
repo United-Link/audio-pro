@@ -32,8 +32,8 @@ audio-vol python volume_monitor.py
 
 ```
 ```bash
-docker compose -f ~/audio-pro/docker-compose_services.yml up -d
-docker compose -f ~/audio-pro/docker-compose_services.yml down
+LIMIT=20 docker compose -f ~/audio-pro/docker-compose_services.yml up -d
+LIMIT=20 docker compose -f ~/audio-pro/docker-compose_services.yml down
 
 docker compose -f ~/audio-pro/docker-compose_control.yml up -d
 docker compose -f ~/audio-pro/docker-compose_control.yml down
