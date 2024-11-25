@@ -7,7 +7,7 @@ services:
       dockerfile: /mnt/audio-pro/Dockerfile_ctl
       
     image: audio-ctl:latest
-    container_name: audio_ctl
+    container_name: audio-ctl
 
     command: ["python", "audio_control.py"]
     ports:
