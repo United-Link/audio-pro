@@ -9,7 +9,7 @@ import subprocess
 
 from gevent import pywsgi
 from flask_cors import CORS
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 CORS(app)
