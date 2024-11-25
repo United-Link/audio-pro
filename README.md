@@ -31,6 +31,14 @@ docker run -d --name audio-vol -it \
 audio-vol python volume_monitor.py
 
 ```
+```bash
+docker compose -f ~/audio-pro/docker-compose_services.yaml up -d
+docker compose -f ~/audio-pro/docker-compose_services.yaml down
+
+docker compose -f ~/audio-pro/docker-compose_control.yaml up -d
+docker compose -f ~/audio-pro/docker-compose_control.yaml down
+
+```
 
 ```bash
 docker buildx build -f Dockerfile_ctl -t audio-ctl .
