@@ -10,20 +10,27 @@ RUN apt-get update && apt-get install -y \
     pipewire-audio-client-libraries \
     pipewire-pulse \
     wireplumber \
+    pulseaudio-utils \
     dbus \
+    dbus-x11 \
     systemd \
     && rm -rf /var/lib/apt/lists/*
 
 # 建立必要的目錄
-RUN mkdir -p /run/user/1000
+RUN mkdir -p /run/user/1000 /run/dbus
 
 # 設定環境變數
 ENV XDG_RUNTIME_DIR=/run/user/1000
 ENV PULSE_SERVER=unix:/run/user/1000/pulse/native
+ENV DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+ENV DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket
 
 # 建立一個非 root 使用者
 RUN useradd -m -u 1000 user
 RUN chown -R user:user /run/user/1000
+
+# 設定 DBus 系統目錄權限
+RUN chown -R user:user /run/dbus
 
 # 切換到非 root 使用者
 USER user
@@ -33,8 +40,13 @@ WORKDIR /home/user
 
 # 建立啟動腳本
 RUN echo '#!/bin/bash\n\
+# 啟動系統 DBus 守護程序\n\
+dbus-daemon --system --nofork --nopidfile &\n\
+sleep 2\n\
+# 啟動使用者 session DBus 守護程序\n\
 dbus-daemon --session --address=unix:path=/run/user/1000/bus --nofork --nopidfile &\n\
 sleep 2\n\
+# 啟動 PipeWire 和相關服務\n\
 pipewire &\n\
 sleep 2\n\
 pipewire-pulse &\n\
