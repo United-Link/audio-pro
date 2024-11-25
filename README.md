@@ -48,7 +48,7 @@ docker run --name audio-ctl --rm -it \
 -v /run/user/1000/pulse:/run/user/1000/pulse \
 -e PULSE_SERVER=unix:/run/user/1000/pulse/native \
 -v /var/run/docker.sock:/var/run/docker.sock \
--v ~/audio-pro/docker-comose_services.yml:/usr/src/app/docker-comose_services.yml \
+-v ~/audio-pro/docker-compose_services.yml:/usr/src/app/docker-compose_services.yml \
 -p 5003:5003 \
 audio-ctl bash
 
@@ -58,7 +58,7 @@ docker run -d --name audio-ctl -it \
 -v /run/user/$(id -u)/pulse:/run/user/$(id -u)/pulse \
 -e PULSE_SERVER=unix:/run/user/$(id -u)/pulse/native \
 -v /var/run/docker.sock:/var/run/docker.sock \
--v ~/audio-pro/docker-comose_services.yml:/usr/src/app/docker-comose_services.yml \
+-v ~/audio-pro/docker-com[ose_services.yml:/usr/src/app/docker-compose_services.yml \
 -p 5003:5003 \
 audio-ctl python audio_control.py
 ```
