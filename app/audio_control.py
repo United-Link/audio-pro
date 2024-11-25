@@ -143,8 +143,8 @@ def _get_audio_status():
         "device": False,
         "source": False,
         "sink": False,
-        "audio_vol": False,
-        "audio_enh": False,
+        "audio-vol": False,
+        "audio-enh": False,
         "limit": None,
     }
 
@@ -173,11 +173,11 @@ def _get_audio_status():
     if pre_flag:
         audio_vol_status = check_audio_vol()
         if audio_vol_status:
-            status["audio_vol"] = True
+            status["audio-vol"] = True
 
         audio_enh_status, limit = check_audio_enh()
         if audio_enh_status:
-            status["audio_enh"] = True
+            status["audio-enh"] = True
             status["limit"] = limit
 
     return status
@@ -213,7 +213,7 @@ def restart_services():
         return jsonify(response_data), 400
 
     status = _get_audio_status()
-    if status["audio_enh"]:
+    if status["audio-enh"]:
         if not os.path.exists(COMPOSE_FILE):
             response_data = {
                 "status": "error",

@@ -45,7 +45,7 @@ services:
 
     image: audio-vol:latest
     container_name: audio-vol
-    command: ["python", "-m", "volume_monitor.py"]
+    command: ["python", "volume_monitor.py"]
     logging:
       driver: "local"
       options:
