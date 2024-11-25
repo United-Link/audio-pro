@@ -16,7 +16,7 @@ app = Flask(__name__)
 CORS(app)
 
 
-COMPOSE_FILE = "docker-comose_services.yaml"
+COMPOSE_FILE = "docker-comose_services.yml"
 DEFAULT_LIMIT = 20
 
 
