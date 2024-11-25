@@ -15,9 +15,9 @@ services:
     devices:
       - /dev/bus/usb:/dev/bus/usb
     volumes:
-      - /run/user/${UID}/pulse:/run/user/${UID}/pulse
+      - /run/user/1000/pulse:/run/user/1000/pulse
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/audio-pro/docker-comose_services.yaml:/usr/src/app/docker-comose_services.yaml
     environment:
-      - PULSE_SERVER=unix:/run/user/${UID}/pulse/native
+      - PULSE_SERVER=unix:/run/user/1000/pulse/native
     restart: unless-stopped
