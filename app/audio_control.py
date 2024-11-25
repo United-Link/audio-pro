@@ -5,6 +5,7 @@ Copyright 2024 United Link Co., Ltd.
 
 import os
 import re
+import json
 import subprocess
 
 from gevent import pywsgi
@@ -74,72 +75,63 @@ def set_volume_levels(device, kind: str):
 
 def check_audio_vol():
     try:
-        status = subprocess.run(
-            [
-                "docker",
-                "ps",
-                "-a",
-                "--filter",
-                "name=audio-vol",
-                "--format",
-                "{{.Status}}",
-            ],
+        result = subprocess.run(
+            ["docker", "inspect", "--format={{json .State}}", "audio-vol"],
             capture_output=True,
             text=True,
             check=True,
-        ).stdout.strip()
-
-        if "Up" not in status:
-            return False
+        )
+        state_json = result.stdout.strip()
+        if state_json:
+            state_dict = json.loads(state_json)
+            if state_dict["Running"]:
+                return True
+            else:
+                return False
         else:
-            return True
-
+            return False
     except subprocess.CalledProcessError:
+        return False
+    except json.JSONDecodeError:
+        return False
+    except Exception:
         return False
 
 
 def check_audio_enh():
     try:
-        audio_enh_status = subprocess.run(
-            [
-                "docker",
-                "ps",
-                "-a",
-                "--filter",
-                "name=audio-enh",
-                "--format",
-                "{{.Status}}",
-            ],
+        result = subprocess.run(
+            ["docker", "inspect", "--format={{json .State}}", "audio-enh"],
             capture_output=True,
             text=True,
             check=True,
-        ).stdout.strip()
-
-        if "Up" not in audio_enh_status:
-            return False, None
-
-        audio_enh_command = subprocess.run(
-            [
-                "docker",
-                "ps",
-                "-a",
-                "--filter",
-                "name=audio-enh",
-                "--format",
-                "{{.Command}}",
-            ],
-            capture_output=True,
-            text=True,
-            check=True,
-        ).stdout.strip()
-        match = re.search(r"bash audio_enhance.sh (\d+)", audio_enh_command)
-        if match:
-            parameter = int(match.group(1))
-            return True, parameter
+        )
+        state_json = result.stdout.strip()
+        if state_json:
+            state_dict = json.loads(state_json)
+            if state_dict["Running"]:
+                result = subprocess.run(
+                    ["docker", "inspect", "--format={{json .Command}}", "audio-enh"],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
+                command = result.stdout.strip()
+                match = re.search(r"[bash audio_enhance.sh (\d+)]", command)
+                if match:
+                    limit = int(match.group(1))
+                    return True, limit
+                else:
+                    raise Exception("Invalid Command")
+            else:
+                return False, None
         else:
-            raise ValueError
-
+            return False, None
     except subprocess.CalledProcessError:
+        return False, None
+    except json.JSONDecodeError:
+        return False, None
+    except Exception:
         return False, None
 
 
