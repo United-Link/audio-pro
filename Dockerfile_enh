@@ -1,6 +1,6 @@
 FROM ubuntu:22.04
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # 安裝必要的工具並添加 PPA
 RUN apt update && apt-get install --no-install-recommends -y software-properties-common gnupg2 \
