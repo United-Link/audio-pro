@@ -1,16 +1,15 @@
 FROM ubuntu:22.04
 
-WORKDIR /app
-
-# 安裝必要的工具並添加 PPA
-RUN apt update && apt-get install --no-install-recommends -y pipewire libspa-0.2-modules \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN pipewire --version
-RUN systemctl --user status pipewire || true
+WORKDIR /usr/src/app
+RUN apt update && apt-get install software-properties-common -y
+RUN add-apt-repository ppa:pipewire-debian/pipewire-upstream -y
+RUN apt update && apt-get install -y pipewire libspa-0.2-modules
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY ./ladspa/libdeep_filter_ladspa-0.5.6-x86_64-unknown-linux-gnu.so /usr/lib/ladspa/libdeep_filter_ladspa.so
 COPY ./ladspa/deepfilter-mono-source.conf /root/.config/pipewire/filter-chain.conf.d/filter-chain.conf
 
-COPY app/audio_enhance.sh .
+COPY ./app/audio_enhance.sh .
+
+RUN pipewire --version
+RUN systemctl --user status pipewire || true
