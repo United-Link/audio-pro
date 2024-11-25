@@ -111,7 +111,7 @@ def check_audio_enh():
             state_dict = json.loads(state_json)
             if state_dict["Running"]:
                 result = subprocess.run(
-                    ["docker", "inspect", "--format={{json .Command}}", "audio-enh"],
+                    ["docker", "inspect", "--format={{.Config.Cmd}}", "audio-enh"],
                     capture_output=True,
                     text=True,
                     check=True,
@@ -124,9 +124,9 @@ def check_audio_enh():
                 else:
                     raise Exception("Invalid Command")
             else:
-                return False, None
+                raise Exception("Not Running")
         else:
-            return False, None
+            raise Exception("No State")
     except subprocess.CalledProcessError:
         return False, None
     except json.JSONDecodeError:
