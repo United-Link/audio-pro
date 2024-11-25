@@ -117,7 +117,7 @@ def check_audio_enh():
                     check=True,
                 )
                 command = result.stdout.strip()
-                match = re.search(r"[bash audio_enhance.sh (\d+)]", command)
+                match = re.search(r"\[bash audio_enhance.sh (\d+)\]", command)
                 if match:
                     limit = int(match.group(1))
                     return True, limit
@@ -133,7 +133,8 @@ def check_audio_enh():
     except json.JSONDecodeError:
         print("JSONDecodeError")
         return False, None
-    except Exception:
+    except Exception as e:
+        print(e)
         return False, None
 
 
