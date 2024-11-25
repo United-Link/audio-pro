@@ -3,13 +3,7 @@ FROM ubuntu:22.04
 WORKDIR /app
 
 # 安裝必要的工具並添加 PPA
-RUN apt update && apt-get install --no-install-recommends -y software-properties-common gnupg2 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && add-apt-repository ppa:pipewire-debian/pipewire-upstream
-
-# 安裝 Pipewire，請將 <版本號> 替換為實際版本號
-RUN apt update && apt-get install --no-install-recommends -y pipewire=0.3.48 libspa-0.2-modules=0.3.48-1ubuntu1 \
+RUN apt update && apt-get install --no-install-recommends -y software-properties-common gnupg2 pipewire libspa-0.2-modules \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
