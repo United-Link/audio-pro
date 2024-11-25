@@ -11,11 +11,13 @@ import numpy as np
 import sounddevice as sd
 from gevent import pywsgi
 from flask_cors import CORS
-from flask import Flask, request, jsonify, Response
+from flask import Flask, jsonify
 
 
 app = Flask(__name__)
 CORS(app)
+
+DEVICE_NAME = "DeepFilter Noise Canceling Source"
 
 DURATION = 0.16
 SLEEP_DURATION = 0.08
@@ -23,20 +25,23 @@ FS = 48000
 CHANNELS = 3
 REC_SAMPLES = int(DURATION * FS)
 
+results = {
+    "max": {"input_dbfs": "-inf", "output_dbfs": "-inf"},
+    "rms": {"input_dbfs": "-inf", "output_dbfs": "-inf"},
+    "status": "running",
+}
+
 
 @app.route("/vol_monitor")
 def vol_monitor():
-    return jsonify(scores)
-
-@app.route("/metrics", methods=["GET"])
-def get_metrics():
-    return Response(generate_latest(), mimetype="text/plain")
+    return jsonify(results)
 
 
-def get_device_index_by_name(devices, name):
+def get_device_index_by_name(devices, device_name):
     for index, device in enumerate(devices):
-        if name in device["name"]:
+        if device_name in device["name"]:
             return index
+
     return None
 
 
@@ -46,11 +51,17 @@ def inputstream_recorder(queue, device):
             print(status)
         if not queue.full():
             try:
-                queue.put(indata.copy(), block=False)
-            except:
-                pass
+                queue.put(indata, block=False)
+            except queue.Full:
+                print("Queue (inputstream) is full.")
 
-    with sd.InputStream(samplerate=FS, channels=CHANNELS, device=device, blocksize=REC_SAMPLES, callback=callback):
+    with sd.InputStream(
+        samplerate=FS,
+        channels=CHANNELS,
+        device=device,
+        blocksize=REC_SAMPLES,
+        callback=callback,
+    ):
         while True:
             time.sleep(SLEEP_DURATION)
 
@@ -58,58 +69,59 @@ def inputstream_recorder(queue, device):
 def sdrec_recorder(queue, device):
     while True:
         recording = sd.rec(REC_SAMPLES, samplerate=FS, channels=CHANNELS, device=device)
-        sd.wait() 
-        
+        sd.wait()
+
         if not queue.full():
             try:
-                queue.put(recording.copy(), block=False)
-            except:
-                pass
+                queue.put(recording, block=False)
+            except queue.Full:
+                print("Queue (sdrec) is full.")
 
 
 def compute_dbfs(queue):
-    global scores
+    global results
 
     while True:
         if not queue.empty():
             data = queue.get()
 
-            # vol_max = np.max(data[:, [0, 2]], axis=0)
-            # dbfs = 20 * np.log10(vol_max)
+            vol_max = np.max(data[:, [0, 2]], axis=0)
+            dbfs_max = 20 * np.log10(vol_max)
 
             vol_rms = np.sqrt(np.mean(data[:, [0, 2]] ** 2, axis=0))
-            dbfs = 20 * np.log10(vol_rms)
+            dbfs_rms = 20 * np.log10(vol_rms)
 
-            input_dbfs_metric.set(dbfs[0])
-            output_dbfs_metric.set(dbfs[1])
-            scores["input_dbfs"] = f"{dbfs[0]:.2f}"
-            scores["output_dbfs"] = f"{dbfs[1]:.2f}"
-            
+            results["max"] = {
+                "input_dbfs": f"{dbfs_max[0]:.2f}",
+                "output_dbfs": f"{dbfs_max[1]:.2f}",
+            }
+            results["rms"] = {
+                "input_dbfs": f"{dbfs_rms[0]:.2f}",
+                "output_dbfs": f"{dbfs_rms[1]:.2f}",
+            }
+
         time.sleep(SLEEP_DURATION)
 
 
-scores = {"input_dbfs": "", "output_dbfs": ""}
-
 devices = sd.query_devices()
+try:
+    device_index = get_device_index_by_name(devices, DEVICE_NAME)
+    if device_index is None:
+        raise ValueError(f"'{DEVICE_NAME}' is not found.")
+except ValueError:
+    results["status"] = "error"
+    device_index = None
 
-queue_dfn = queue.Queue(maxsize=1)
-device_name = "DeepFilter Noise Canceling Source"
-device_index = get_device_index_by_name(devices, device_name)
-print(f"Device: {device_name} ({device_index})")
+if device_index is not None:
+    queue_dfn = queue.Queue(maxsize=1)
 
-audio_process = Thread(target=inputstream_recorder, args=(queue_dfn, device_index))
-audio_process.start()
+    audio_process = Thread(target=inputstream_recorder, args=(queue_dfn, device_index))
+    audio_process.start()
 
-dbfs_process = Thread(target=compute_dbfs, args=(queue_dfn,))
-dbfs_process.start()
-
-@app.route("/health")
-def check_health():
-    if device_index is not None:
-        return {}, 200
-    else:
-        return {}, 500
+    dbfs_process = Thread(target=compute_dbfs, args=(queue_dfn,))
+    dbfs_process.start()
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5002)
+    server = pywsgi.WSGIServer(("0.0.0.0", 5002), app)
+    server.serve_forever()

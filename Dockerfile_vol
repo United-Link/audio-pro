@@ -1,0 +1,20 @@
+FROM ubuntu:22.04
+
+WORKDIR /usr/src/app
+RUN apt update && apt install software-properties-common -y
+RUN add-apt-repository ppa:pipewire-debian/pipewire-upstream -y
+RUN apt update && apt install -y pipewire libspa-0.2-modules
+RUN apt install -y python3-pip python3-pyaudio pipewire-audio-client-libraries
+RUN apt clean && rm -rf /var/lib/apt/lists/*
+
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+RUN pip install uv
+COPY ./requirements.txt .
+RUN uv pip install -r requirements.txt
+
+ENV PULSE_SERVER=unix:/run/user/1000/pulse/native
+ENV PULSE_COOKIE=/run/user/1000/pulse/cookie
+ENV XDG_RUNTIME_DIR=/run/user/1000
+
+COPY ./app/volume_monitor.sh .
