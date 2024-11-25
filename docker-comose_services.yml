@@ -3,8 +3,8 @@ name: audio_services
 services:
   audio-enh:
     build:
-      context: /mnt/audio-pro
-      dockerfile: /mnt/audio-pro/Dockerfile_enh
+      context: ~/audio-pro
+      dockerfile: ~/audio-pro/Dockerfile_enh
 
     restart: always
     volumes:
@@ -25,8 +25,8 @@ services:
 
   audio-vol:
     build:
-      context: /mnt/audio-pro
-      dockerfile: /mnt/audio-pro/Dockerfile_vol
+      context: ~/audio-pro
+      dockerfile: ~/audio-pro/Dockerfile_vol
 
     restart: always
     depends_on:
