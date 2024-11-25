@@ -3,7 +3,7 @@ FROM ubuntu:22.04
 WORKDIR /app
 
 # 安裝必要的工具並添加 PPA
-RUN apt update && apt-get install --no-install-recommends -y software-properties-common gnupg2 pipewire libspa-0.2-modules \
+RUN apt update && apt-get install --no-install-recommends -y pipewire libspa-0.2-modules \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
