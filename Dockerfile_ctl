@@ -2,7 +2,7 @@ FROM python:3.10.12-slim
 
 ENV PYTHONUNBUFFERED=1
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -27,4 +27,4 @@ RUN curl -L "https://github.com/docker/compose/releases/latest/download/docker-c
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py .
+COPY audio_control.py .

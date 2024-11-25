@@ -1,0 +1,55 @@
+name: audio_services
+
+services:
+  audio-enh:
+    build:
+      context: /mnt/audio-pro
+      dockerfile: /mnt/audio-pro/Dockerfile_enh
+
+    restart: always
+    volumes:
+      - type: bind
+        source: /run/user/1000/pipewire-0
+        target: /run/user/1000/pipewire-0
+        bind:
+          create_host_path: false
+    
+    image: audio-enh:latest
+    container_name: audio-enh
+    command: ["bash", "audio_enhance.sh", "$LIMIT"]
+    logging:
+      driver: "local"
+      options:
+        max-size: "100m"
+        max-file: "14"
+
+  audio-vol:
+    build:
+      context: /mnt/audio-pro
+      dockerfile: /mnt/audio-pro/Dockerfile_vol
+
+    restart: always
+    depends_on:
+      - audio-enh
+    volumes:
+      - type: bind
+        source: /run/user/1000/pulse/native
+        target: /run/user/1000/pulse/native
+        bind:
+          create_host_path: false
+      - type: bind
+        source: /run/user/1000/pipewire-0
+        target: /run/user/1000/pipewire-0
+        bind:
+          create_host_path: false
+
+    image: audio-vol:latest
+    container_name: audio-vol
+    command: ["python", "-m", "volume_monitor.py"]
+    logging:
+      driver: "local"
+      options:
+        max-size: "100m"
+        max-file: "14"
+    ports:
+      - "5002:5002"

@@ -3,7 +3,6 @@ Author: Hung-Shin Lee
 Copyright 2024 United Link Co., Ltd.
 """
 
-
 import os
 import re
 import subprocess
@@ -16,15 +15,13 @@ app = Flask(__name__)
 CORS(app)
 
 
-COMPOSE_FILE = "/mnt/audio/NorthAudio/space/run_dfn_n_vol.yaml"
+COMPOSE_FILE = "docker-comose_services.yaml"
 DEFAULT_LIMIT = 20
 
 
 def check_device_exists():
     try:
-        result = subprocess.run(
-            ["lsusb"], capture_output=True, text=True, check=True
-        )
+        result = subprocess.run(["lsusb"], capture_output=True, text=True, check=True)
         return "US-2x2HR" in result.stdout
     except subprocess.CalledProcessError:
         return False
@@ -213,9 +210,7 @@ def restart_services():
 
     if not isinstance(limit, int) or limit <= 0:
         return (
-            jsonify(
-                {"error": "Invalid limit value, must be a positive integer"}
-            ),
+            jsonify({"error": "Invalid limit value, must be a positive integer"}),
             400,
         )
 
@@ -257,5 +252,5 @@ def restart_services():
 
 
 if __name__ == "__main__":
-    server = pywsgi.WSGIServer(("0.0.0.0", 9527), app)
+    server = pywsgi.WSGIServer(("0.0.0.0", 5003), app)
     server.serve_forever()
