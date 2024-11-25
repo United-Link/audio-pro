@@ -40,7 +40,7 @@ docker run --name audio-ctl --rm -it \
 -v /run/user/$(id -u)/pulse:/run/user/$(id -u)/pulse \
 -e PULSE_SERVER=unix:/run/user/$(id -u)/pulse/native \
 -v /var/run/docker.sock:/var/run/docker.sock \
--v /mnt/audio/NorthAudio/space/run_dfn_n_vol.yaml:/mnt/audio/NorthAudio/space/run_dfn_n_vol.yaml \
+-v /mnt/audio-pro/docker-comose_services.yaml:/usr/src/app/docker-comose_services.yaml \
 -p 5003:5003 \
 audio-ctl bash
 
@@ -50,7 +50,7 @@ docker run -d --name audio-ctl -it \
 -v /run/user/$(id -u)/pulse:/run/user/$(id -u)/pulse \
 -e PULSE_SERVER=unix:/run/user/$(id -u)/pulse/native \
 -v /var/run/docker.sock:/var/run/docker.sock \
--v /mnt/audio/NorthAudio/space/run_dfn_n_vol.yaml:/mnt/audio/NorthAudio/space/run_dfn_n_vol.yaml \
+-v /mnt/audio-pro/docker-comose_services.yaml:/usr/src/app/docker-comose_services.yaml \
 -p 5003:5003 \
 audio-ctl python audio_control.py
 ```

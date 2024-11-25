@@ -9,7 +9,7 @@ import subprocess
 
 from gevent import pywsgi
 from flask_cors import CORS
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 
 app = Flask(__name__)
 CORS(app)
@@ -36,16 +36,11 @@ def query_default_audio_devices():
             ["pactl", "info"], capture_output=True, text=True, check=True
         )
         output = result.stdout
-        default_source = (
-            re.search(r"Default Source:\s*(.+)", output).group(1)
-            if re.search(r"Default Source:\s*(.+)", output)
-            else None
-        )
-        default_sink = (
-            re.search(r"Default Sink:\s*(.+)", output).group(1)
-            if re.search(r"Default Sink:\s*(.+)", output)
-            else None
-        )
+        match = re.search(r"Default Source:\s*(.+)", output)
+        default_source = match.group(1) if match else None
+
+        match = re.search(r"Default Sink:\s*(.+)", output)
+        default_sink = match.group(1) if match else None
 
         return default_source, default_sink
     except (
@@ -137,7 +132,7 @@ def check_audio_enh():
             text=True,
             check=True,
         ).stdout.strip()
-        match = re.search(r"bash run_dfn.sh (\d+)", audio_enh_command)
+        match = re.search(r"bash audio_enhance.sh (\d+)", audio_enh_command)
         if match:
             parameter = int(match.group(1))
             return True, parameter
@@ -209,18 +204,27 @@ def restart_services():
         limit = data.get("limit", DEFAULT_LIMIT)
 
     if not isinstance(limit, int) or limit <= 0:
-        return (
-            jsonify({"error": "Invalid limit value, must be a positive integer"}),
-            400,
-        )
+        response_data = {
+            "status": "error",
+            "message": "Invalid limit value, must be a positive integer",
+        }
+        return jsonify(response_data), 400
 
     if int(limit) < 0 or int(limit) > 100:
-        return jsonify({"error": "Limit must be between 0 and 100"}), 400
+        response_data = {
+            "status": "error",
+            "message": "Limit must be between 0 and 100",
+        }
+        return jsonify(response_data), 400
 
     status = _get_audio_status()
     if status["audio_enh"]:
         if not os.path.exists(COMPOSE_FILE):
-            return (jsonify({"error": "Compose File not found"}),)
+            response_data = {
+                "status": "error",
+                "message": "Compose File not found",
+            }
+            return jsonify(response_data), 400
 
         subprocess.run(
             [
@@ -246,9 +250,17 @@ def restart_services():
             env={**os.environ, "LIMIT": str(limit)},
         )
 
-        return jsonify({"message": f"Limit set to {limit}"}), 200
+        response_data = {
+            "status": "sucess",
+            "message": f"Limit set to {limit}",
+        }
+        return jsonify(response_data), 200
     else:
-        return jsonify({"error": "audio_enh is not running"}), 400
+        response_data = {
+            "status": "error",
+            "message": "audio-enh is not running",
+        }
+        return jsonify(response_data), 400
 
 
 if __name__ == "__main__":
