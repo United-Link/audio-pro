@@ -17,4 +17,4 @@ ENV PULSE_SERVER=unix:/run/user/1000/pulse/native
 ENV PULSE_COOKIE=/run/user/1000/pulse/cookie
 ENV XDG_RUNTIME_DIR=/run/user/1000
 
-COPY ./app/volume_monitor.sh .
+COPY ./app/volume_monitor.py .
