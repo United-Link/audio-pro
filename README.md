@@ -45,8 +45,8 @@ docker buildx build -f Dockerfile_ctl -t audio-ctl .
 
 docker run --name audio-ctl --rm -it \
 --device /dev/bus/usb:/dev/bus/usb \
--v /run/user/$(id -u)/pulse:/run/user/$(id -u)/pulse \
--e PULSE_SERVER=unix:/run/user/$(id -u)/pulse/native \
+-v /run/user/1000/pulse:/run/user/1000/pulse \
+-e PULSE_SERVER=unix:/run/user/1000/pulse/native \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v /mnt/audio-pro/docker-comose_services.yaml:/usr/src/app/docker-comose_services.yaml \
 -p 5003:5003 \

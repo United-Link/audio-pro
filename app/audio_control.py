@@ -122,7 +122,7 @@ def check_audio_enh():
                     limit = int(match.group(1))
                     return True, limit
                 else:
-                    raise Exception("Invalid Command")
+                    raise Exception(f"Invalid Command: {command}")
             else:
                 raise Exception("Not Running")
         else:
