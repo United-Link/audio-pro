@@ -248,7 +248,7 @@ def restart_services():
         )
 
         response_data = {
-            "status": "sucess",
+            "status": "success",
             "message": f"Limit set to {limit}",
         }
         return jsonify(response_data), 200
