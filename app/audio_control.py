@@ -221,14 +221,20 @@ def restart_services():
             }
             return jsonify(response_data), 400
 
+        # subprocess.run(
+        #     [
+        #         "docker",
+        #         "compose",
+        #         "-f",
+        #         COMPOSE_FILE,
+        #         "down",
+        #     ],
+        #     check=True,
+        #     capture_output=True,
+        # )
+
         subprocess.run(
-            [
-                "docker",
-                "compose",
-                "-f",
-                COMPOSE_FILE,
-                "down",
-            ],
+            ["docker", "rm", "-f", "audio-enh", "audio-vol"],
             check=True,
             capture_output=True,
         )
