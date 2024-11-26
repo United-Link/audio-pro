@@ -26,15 +26,18 @@ CHANNELS = 3
 REC_SAMPLES = int(DURATION * FS)
 
 results = {
-    "max": {"input_dbfs": "-inf", "output_dbfs": "-inf"},
-    "rms": {"input_dbfs": "-inf", "output_dbfs": "-inf"},
+    "max_dbfs": {"input": "-inf", "output": "-inf"},
+    "rms_dbfs": {"input": "-inf", "output": "-inf"},
     "status": "running",
 }
+
+results_old = {"input_dbfs": "-inf", "output_dbfs": "-inf"}
 
 
 @app.route("/vol_monitor")
 def vol_monitor():
-    return jsonify(results)
+    # return jsonify(results)
+    return jsonify(results_old)
 
 
 def get_device_index_by_name(devices, device_name):
@@ -80,6 +83,7 @@ def sdrec_recorder(queue, device):
 
 def compute_dbfs(queue):
     global results
+    global results_old
 
     while True:
         if not queue.empty():
@@ -91,14 +95,16 @@ def compute_dbfs(queue):
             vol_rms = np.sqrt(np.mean(data[:, [0, 2]] ** 2, axis=0))
             dbfs_rms = 20 * np.log10(vol_rms)
 
-            results["max"] = {
-                "input_dbfs": f"{dbfs_max[0]:.2f}",
-                "output_dbfs": f"{dbfs_max[1]:.2f}",
+            results["max_dbfs"] = {
+                "input": f"{dbfs_max[0]:.2f}",
+                "output": f"{dbfs_max[1]:.2f}",
             }
-            results["rms"] = {
-                "input_dbfs": f"{dbfs_rms[0]:.2f}",
-                "output_dbfs": f"{dbfs_rms[1]:.2f}",
+            results["rms_dbfs"] = {
+                "input": f"{dbfs_rms[0]:.2f}",
+                "output": f"{dbfs_rms[1]:.2f}",
             }
+            results_old["input_dbfs"] = f"{dbfs_rms[0]:.2f}"
+            results_old["output_dbfs"] = f"{dbfs_rms[1]:.2f}"
 
         time.sleep(SLEEP_DURATION)
 
