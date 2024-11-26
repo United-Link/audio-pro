@@ -234,9 +234,17 @@ def restart_services():
         # )
 
         subprocess.run(
-            ["docker", "rm", "-f", "audio-enh", "audio-vol"],
+            ["docker", "rm", "-f", "audio-vol"],
             check=True,
             capture_output=True,
+            text=True,
+        )
+
+        subprocess.run(
+            ["docker", "rm", "-f", "audio-enh"],
+            check=True,
+            capture_output=True,
+            text=True,
         )
 
         subprocess.run(
@@ -250,6 +258,7 @@ def restart_services():
             ],
             check=True,
             capture_output=True,
+            text=True,
             env={**os.environ, "LIMIT": str(limit)},
         )
 
