@@ -4,6 +4,7 @@
 1. volume_monitor.py 要換成新版
 2. docker compose 中的 ~/ 要換成 /mnt/
 
+
 ## Developement Environment
 
 ```bash
@@ -14,6 +15,7 @@ conda activate audio-pro
 pip install -r requirements.txt
 
 ```
+
 
 ## AUDIO ENHANCE
 
@@ -29,6 +31,7 @@ docker run --name audio-enh --rm -it \
 audio-enh bash
 ```
 
+
 ## VOLUME MONITOR
 
 ```bash
@@ -41,6 +44,10 @@ docker run -d --name audio-vol -it \
 -p 5002:5002 \
 audio-vol python volume_monitor.py
 ```
+```bash
+curl http://10.22.1.151:5002/vol_monitor
+```
+
 
 ## AUDIO CONTROL
 
@@ -56,6 +63,15 @@ docker run -d --name audio-ctl -it \
 -p 5003:5003 \
 audio-ctl python audio_control.py
 ```
+
+```bash
+curl http://10.22.1.151:5003/audio_status
+
+curl -X PUT http://10.22.1.151:5003/restart_services \
+-H "Content-Type: application/json" \
+-d '{"limit": 32}'
+```
+
 
 ## DOCKER COMPOSE
 
