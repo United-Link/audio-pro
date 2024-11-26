@@ -13,6 +13,8 @@ services:
         target: /run/user/1000/pipewire-0
         bind:
           create_host_path: false
+    environment:
+      - XDG_RUNTIME_DIR=/run/user/1000/
     
     image: audio-enh:latest
     container_name: audio-enh
