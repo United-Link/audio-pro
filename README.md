@@ -1,5 +1,9 @@
 # audio-pro
 
+## NOTE
+1. volume_monitor.py 要換成新版
+2. docker compose 中的 ~/ 要換成 /mnt/
+
 ## Developement Environment
 
 ```bash
