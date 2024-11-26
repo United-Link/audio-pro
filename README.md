@@ -34,16 +34,6 @@ docker run -d --name audio-vol -it \
 audio-vol python volume_monitor.py
 ```
 
-## DOCKER COMPOSE (SERVICES)
-
-```bash
-LIMIT=20 docker compose -f ~/audio-pro/docker-compose_services.yml up -d
-LIMIT=20 docker compose -f ~/audio-pro/docker-compose_services.yml down
-
-docker compose -f ~/audio-pro/docker-compose_control.yml up -d
-docker compose -f ~/audio-pro/docker-compose_control.yml down
-```
-
 ## AUDIO CONTROL
 
 ```bash
@@ -57,4 +47,14 @@ docker run -d --name audio-ctl -it \
 -v ~/audio-pro/docker-compose_services.yml:/usr/src/app/docker-compose_services.yml \
 -p 5003:5003 \
 audio-ctl python audio_control.py
+```
+
+## DOCKER COMPOSE
+
+```bash
+LIMIT=20 docker compose -f ~/audio-pro/docker-compose_services.yml up -d
+LIMIT=20 docker compose -f ~/audio-pro/docker-compose_services.yml down
+
+docker compose -f ~/audio-pro/docker-compose_control.yml up -d
+docker compose -f ~/audio-pro/docker-compose_control.yml down
 ```
