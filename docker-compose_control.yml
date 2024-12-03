@@ -3,8 +3,8 @@ name: audio_control
 services:
   audio_ctl:
     build:
-      context: ~/audio-pro
-      dockerfile: /mnt/audio-pro/Dockerfile_ctl
+      context: /mnt/audio/audio-pro
+      dockerfile: /mnt/audio/audio-pro/Dockerfile_ctl
       
     image: audio-ctl:latest
     container_name: audio-ctl
@@ -17,7 +17,7 @@ services:
     volumes:
       - /run/user/1000/pulse:/run/user/1000/pulse
       - /var/run/docker.sock:/var/run/docker.sock
-      - ~/audio-pro/docker-compose_services.yml:/usr/src/app/docker-compose_services.yml
+      - /mnt/audio/audio-pro/docker-compose_services.yml:/usr/src/app/docker-compose_services.yml
     environment:
       - PULSE_SERVER=unix:/run/user/1000/pulse/native
     restart: unless-stopped
