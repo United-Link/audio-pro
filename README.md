@@ -1,9 +1,8 @@
 # audio-pro
 
 ## NOTE
-1. volume_monitor.py 要換成新版
-2. docker compose 中的 ~/ 要換成 /mnt/
-3. GitHub 權限
+1. volume_monitor.py 仍是舊版
+2. GitHub Repo 權限目前是 Public
 
 
 ## Developement Environment
