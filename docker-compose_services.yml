@@ -3,8 +3,8 @@ name: audio_services
 services:
   audio-enh:
     build:
-      context: /mnt/audio/audio-pro
-      dockerfile: /mnt/audio/audio-pro/Dockerfile_enh
+      context: /home/ulink/audio-pro
+      dockerfile: /home/ulink/audio-pro/Dockerfile_enh
 
     restart: always
     volumes:
@@ -15,8 +15,9 @@ services:
           create_host_path: false
     environment:
       - XDG_RUNTIME_DIR=/run/user/1000/
+      - TAGVERSION=${TAGVERSION}
     
-    image: audio-enh:latest
+    image: audio-enh:${TAGVERSION}
     container_name: audio-enh
     command: ["bash", "audio_enhance.sh", "$LIMIT"]
     logging:
@@ -27,13 +28,14 @@ services:
 
   audio-vol:
     build:
-      context: /mnt/audio/audio-pro
-      dockerfile: /mnt/audio/audio-pro/Dockerfile_vol
+      context: /home/ulink/audio-pro
+      dockerfile: /home/ulink/audio-pro/Dockerfile_vol
 
     restart: always
     depends_on:
       - audio-enh
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - type: bind
         source: /run/user/1000/pulse/native
         target: /run/user/1000/pulse/native
@@ -44,8 +46,9 @@ services:
         target: /run/user/1000/pipewire-0
         bind:
           create_host_path: false
-
-    image: audio-vol:latest
+    environment:
+      - TAGVERSION=${TAGVERSION}
+    image: audio-vol:${TAGVERSION}
     container_name: audio-vol
     command: ["python", "volume_monitor.py"]
     logging:
