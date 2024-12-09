@@ -3,10 +3,10 @@ name: audio_control
 services:
   audio_ctl:
     build:
-      context: /mnt/audio/audio-pro
-      dockerfile: /mnt/audio/audio-pro/Dockerfile_ctl
+      context: /home/ulink/audio-pro
+      dockerfile: /home/ulink/audio-pro/Dockerfile_ctl
       
-    image: audio-ctl:latest
+    image: audio-ctl:${TAGVERSION}
     container_name: audio-ctl
 
     command: ["python", "audio_control.py"]
@@ -17,7 +17,9 @@ services:
     volumes:
       - /run/user/1000/pulse:/run/user/1000/pulse
       - /var/run/docker.sock:/var/run/docker.sock
-      - /mnt/audio/audio-pro/docker-compose_services.yml:/usr/src/app/docker-compose_services.yml
+      - /home/ulink/audio-pro/docker-compose_services.yml:/usr/src/app/docker-compose_services.yml
+      - /etc/localtime:/etc/localtime:ro
     environment:
       - PULSE_SERVER=unix:/run/user/1000/pulse/native
+      - TAGVERSION=${TAGVERSION}
     restart: unless-stopped
