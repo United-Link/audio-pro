@@ -47,6 +47,7 @@ audio-vol bash
 docker run --name audio-vol --rm -it \
 --volume /run/user/$UID/pipewire-0:/run/user/$UID/pipewire-0 \
 --env PIPEWIRE_RUNTIME_DIR=/run/user/$UID/pipewire-0 \
+--env PULSE_COOKIE=/run/user/1000/pulse/cookie \
 --env XDG_RUNTIME_DIR=/run/user/$UID \
 audio-vol bash
 
