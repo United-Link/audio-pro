@@ -17,31 +17,41 @@ if device_index is None:
     exit()
 
 
+# 定義一個全域變數來儲存音訊資料
+audio_data = None
+
+
 # 定義音訊串流的回呼函數
-def callback(outdata, frames, time, status):
+def callback(indata, frames, time, status):
+    global audio_data
     if status:
         print(status)
-    # 在這裡，outdata 是空的，因為我們只讀取，不輸出。
-    # 如果需要輸出音訊，可以在這裡填充 outdata。
+    audio_data = indata.copy()  # 將音訊資料複製到全域變數
 
 
 # 開啟音訊串流
 try:
-    with sd.RawInputStream(
+    with sd.InputStream(
         device=device_index,
-        channels=1,
+        channels=1,  # 單聲道
         samplerate=SAMPLE_RATE,
-        blocksize=BLOCKSIZE,
+        callback=callback,
+        blocksize=int(SAMPLE_RATE * DURATION),  # 每次擷取的樣本數
         dtype=np.float32,
     ) as stream:
         print("開始擷取音訊...")
         while True:
-            # 讀取音訊資料
-            audio_data, overflow = stream.read(BLOCKSIZE)
-            if overflow:
-                print("音訊溢位!")
-            # 顯示音訊值
-            print(audio_data[:, 0])
+            # 等待音訊資料被回呼函數更新
+            if audio_data is not None:
+                # 檢查形狀並處理
+                if audio_data.shape == (int(SAMPLE_RATE * DURATION), 1):
+                    print(audio_data[:, 0])  # 二維陣列 (n, 1)
+                elif audio_data.shape == (int(SAMPLE_RATE * DURATION),):
+                    print(audio_data)  # 一維陣列 (n,)
+                else:
+                    print("音訊資料形狀錯誤:", audio_data.shape)
+                audio_data = None  # 清空音訊資料，等待下一次更新
+            sd.sleep(int(DURATION * 1000))  # 等待一段時間，避免 CPU 使用率過高
 
 except KeyboardInterrupt:
     print("停止擷取音訊...")
