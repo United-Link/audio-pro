@@ -45,8 +45,7 @@ try:
             if audio_data is not None:
                 # 檢查形狀並處理
                 if audio_data.shape == (BLOCKSIZE, 1):
-                    print("A")
-                    print(audio_data[:, 0])  # 二維陣列 (n, 1)
+                    print(audio_data)  # 二維陣列 (n, 1)
                 elif audio_data.shape == (BLOCKSIZE,):
                     # print(audio_data)  # 一維陣列 (n,)
                     vol_max = np.max(audio_data, axis=0)
