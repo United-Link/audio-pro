@@ -29,6 +29,7 @@ audio-enh bash audio_enhance.sh 20
 docker run --name audio-enh --rm -it \
 -v /run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
 -e XDG_RUNTIME_DIR=/run/user/1000 \
+-e TZ=Asia/Taipei \
 audio-enh bash
 ```
 
@@ -85,6 +86,7 @@ curl -X PUT http://10.22.1.151:5003/restart_services \
 ## DOCKER COMPOSE
 
 ```bash
+LIMIT=20 docker compose -f /mnt/audio/audio-pro/docker-compose_services.yml build
 LIMIT=20 docker compose -f /mnt/audio/audio-pro/docker-compose_services.yml up -d
 LIMIT=20 docker compose -f /mnt/audio/audio-pro/docker-compose_services.yml down
 
