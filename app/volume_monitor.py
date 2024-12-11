@@ -34,12 +34,6 @@ results = {
 results_old = {"input_dbfs": "-inf", "output_dbfs": "-inf"}
 
 
-@app.route("/vol_monitor")
-def vol_monitor():
-    # return jsonify(results)
-    return jsonify(results_old)
-
-
 def get_device_index_by_name(devices, device_name):
     for index, device in enumerate(devices):
         if device_name in device["name"]:
@@ -109,25 +103,45 @@ def compute_dbfs(queue):
         time.sleep(SLEEP_DURATION)
 
 
-devices = sd.query_devices()
-try:
-    device_index = get_device_index_by_name(devices, DEVICE_NAME)
-    if device_index is None:
-        raise ValueError(f"'{DEVICE_NAME}' is not found.")
-except ValueError:
-    results["status"] = "error"
-    device_index = None
+def initialize_app():
+    """
+    初始化 Flask 應用程式的全域變數和模型
 
-if device_index is not None:
-    queue_dfn = queue.Queue(maxsize=1)
+    Args:
+        app (Flask): Flask 應用程式實例
+    """
+    devices = sd.query_devices()
+    try:
+        device_index = get_device_index_by_name(devices, DEVICE_NAME)
+        if device_index is None:
+            raise ValueError(f"'{DEVICE_NAME}' is not found.")
+    except ValueError:
+        results["status"] = "error"
+        device_index = None
 
-    audio_process = Thread(target=inputstream_recorder, args=(queue_dfn, device_index))
-    audio_process.start()
+    if device_index is not None:
+        global queue_dfn
+        queue_dfn = queue.Queue(maxsize=1)
 
-    dbfs_process = Thread(target=compute_dbfs, args=(queue_dfn,))
-    dbfs_process.start()
+        global audio_process
+        audio_process = Thread(
+            target=inputstream_recorder, args=(queue_dfn, device_index)
+        )
+        audio_process.start()
+
+        global dbfs_process
+        dbfs_process = Thread(target=compute_dbfs, args=(queue_dfn,))
+        dbfs_process.start()
+
+
+@app.route("/vol_monitor")
+def vol_monitor():
+    # return jsonify(results)
+    return jsonify(results_old)
 
 
 if __name__ == "__main__":
+    initialize_app()
+
     server = pywsgi.WSGIServer(("0.0.0.0", 5002), app)
     server.serve_forever()
