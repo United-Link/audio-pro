@@ -1,6 +1,9 @@
 import sounddevice as sd
 import numpy as np
 
+DEVICE_NAME = "DeepFilter Noise Canceling Source"
+# DEVICE_NAME = "US-2x2HR"
+
 # 設定音訊參數
 SAMPLE_RATE = 48000  # 取樣率
 DURATION = 0.16  # 每次擷取的音訊長度 (秒)
@@ -11,9 +14,10 @@ device_info = sd.query_devices()
 print(device_info)
 
 device_index = None
-for i, dev in enumerate(device_info):
-    if "US-2x2HR" in dev["name"] and dev["max_output_channels"] > 0:
-        device_index = i
+for dev in enumerate(device_info):
+    if DEVICE_NAME in dev["name"] and dev["max_output_channels"] > 0:
+        device_index = dev["index"]
+
 if device_index is None:
     print("找不到 TASCAM US-2x2 HR 輸出裝置")
     exit()
@@ -35,7 +39,7 @@ def callback(indata, frames, time, status):
 try:
     with sd.InputStream(
         device=device_index,
-        channels=2,  # 單聲道
+        channels=3,  # 單聲道
         samplerate=SAMPLE_RATE,
         callback=callback,
         blocksize=BLOCKSIZE,  # 每次擷取的樣本數

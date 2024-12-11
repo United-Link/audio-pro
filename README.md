@@ -39,6 +39,7 @@ bash audio_enhance.sh 20
 docker buildx build -f Dockerfile_vol -t audio-vol .
 
 docker run --name audio-vol --rm -it \
+--device /dev/snd/by-id/usb-TASCAM_US-2x2HR_no_serial_number-00 \
 --volume /run/user/1000/pulse/native:/run/user/1000/pulse/native \
 --volume /run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
 --env PULSE_SERVER=unix:/run/user/1000/pulse/native \
