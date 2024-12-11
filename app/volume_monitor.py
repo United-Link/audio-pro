@@ -121,7 +121,7 @@ with sd.InputStream(
             vol_max = np.max(audio_data[:, [2, 0]], axis=0)
             dbfs_max = np.maximum(20 * np.log10(vol_max), -120)
 
-            results_old["input_dbfs"] = f"{dbfs_max[2]:.2f}"
+            results_old["input_dbfs"] = f"{dbfs_max[0]:.2f}"
             results_old["output_dbfs"] = f"{dbfs_max[1]:.2f}"
 
             audio_data = None  # 清空音訊資料，等待下一次更新
