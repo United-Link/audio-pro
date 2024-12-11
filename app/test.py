@@ -3,7 +3,7 @@ import numpy as np
 
 # 設定音訊參數
 SAMPLE_RATE = 48000  # 取樣率
-DURATION = 0.1  # 每次擷取的音訊長度 (秒)
+DURATION = 0.16  # 每次擷取的音訊長度 (秒)
 BLOCKSIZE = int(SAMPLE_RATE * DURATION)  # 每次讀取的樣本數
 
 # 找到 TASCAM US-2x2 HR 的輸出裝置索引
@@ -36,7 +36,7 @@ try:
         channels=1,  # 單聲道
         samplerate=SAMPLE_RATE,
         callback=callback,
-        blocksize=int(SAMPLE_RATE * DURATION),  # 每次擷取的樣本數
+        blocksize=BLOCKSIZE,  # 每次擷取的樣本數
         dtype=np.float32,
     ) as stream:
         print("開始擷取音訊...")
@@ -44,10 +44,13 @@ try:
             # 等待音訊資料被回呼函數更新
             if audio_data is not None:
                 # 檢查形狀並處理
-                if audio_data.shape == (int(SAMPLE_RATE * DURATION), 1):
+                if audio_data.shape == (BLOCKSIZE, 1):
                     print(audio_data[:, 0])  # 二維陣列 (n, 1)
-                elif audio_data.shape == (int(SAMPLE_RATE * DURATION),):
-                    print(audio_data)  # 一維陣列 (n,)
+                elif audio_data.shape == (BLOCKSIZE,):
+                    # print(audio_data)  # 一維陣列 (n,)
+                    vol_max = np.max(audio_data, axis=0)
+                    dbfs_max = np.maximum(20 * np.log10(vol_max), -120)
+                    print(dbfs_max)
                 else:
                     print("音訊資料形狀錯誤:", audio_data.shape)
                 audio_data = None  # 清空音訊資料，等待下一次更新
