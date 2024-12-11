@@ -18,6 +18,8 @@ services:
       - /run/user/1000/pulse:/run/user/1000/pulse
       - /var/run/docker.sock:/var/run/docker.sock
       - /mnt/audio/audio-pro/docker-compose_services.yml:/usr/src/app/docker-compose_services.yml
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     environment:
       - PULSE_SERVER=unix:/run/user/1000/pulse/native
       - TZ=Asia/Taipei

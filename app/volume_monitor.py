@@ -24,12 +24,6 @@ SAMPLE_RATE = 48000
 CHANNELS = 3
 BLOCKSIZE = int(DURATION * SAMPLE_RATE)
 
-# results = {
-#     "max_dbfs": {"input": "-inf", "output": "-inf"},
-#     "rms_dbfs": {"input": "-inf", "output": "-inf"},
-#     "status": "running",
-# }
-
 results = {"input_dbfs": "-inf", "output_dbfs": "-inf"}
 
 
@@ -71,17 +65,9 @@ def compute_dbfs(audio_data: queue.Queue):
             vol_max = np.max(data[:, [2, 0]], axis=0)
             dbfs_max = np.maximum(20 * np.log10(vol_max), -120)
 
-            # vol_rms = np.sqrt(np.mean(data[:, [0, 2]] ** 2, axis=0))
-            # dbfs_rms = max(20 * np.log10(vol_rms), -120)
+            # vol_rms = np.sqrt(np.mean(data[:, [2, 0]] ** 2, axis=0))
+            # dbfs_rms = np.maximum(20 * np.log10(vol_rms), -120)
 
-            # results["max_dbfs"] = {
-            #     "input": f"{dbfs_max[0]:.2f}",
-            #     "output": f"{dbfs_max[1]:.2f}",
-            # }
-            # results["rms_dbfs"] = {
-            #     "input": f"{dbfs_rms[0]:.2f}",
-            #     "output": f"{dbfs_rms[1]:.2f}",
-            # }
             results["input_dbfs"] = f"{dbfs_max[0]:.2f}"
             results["output_dbfs"] = f"{dbfs_max[1]:.2f}"
 

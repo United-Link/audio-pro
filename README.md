@@ -23,10 +23,10 @@ pip install -r requirements.txt
 docker buildx build -f Dockerfile_enh -t audio-enh .
 
 docker run --name audio-enh --rm -it \
--v /run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
--v /etc/localtime:/etc/localtime:ro \
--v /etc/timezone:/etc/timezone:ro \
--e XDG_RUNTIME_DIR=/run/user/1000 \
+--volume /run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
+--volume /etc/localtime:/etc/localtime:ro \
+--volume /etc/timezone:/etc/timezone:ro \
+--env XDG_RUNTIME_DIR=/run/user/1000 \
 audio-enh bash
 
 bash audio_enhance.sh 20
@@ -39,9 +39,10 @@ bash audio_enhance.sh 20
 docker buildx build -f Dockerfile_vol -t audio-vol .
 
 docker run --name audio-vol --rm -it \
---device /dev/snd/by-id/usb-TASCAM_US-2x2HR_no_serial_number-00 \
 --volume /run/user/1000/pulse/native:/run/user/1000/pulse/native \
 --volume /run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
+--volume /etc/localtime:/etc/localtime:ro \
+--volume /etc/timezone:/etc/timezone:ro \
 --env PULSE_SERVER=unix:/run/user/1000/pulse/native \
 --env PULSE_COOKIE=/run/user/1000/pulse/cookie \
 --env XDG_RUNTIME_DIR=/run/user/1000 \
@@ -60,20 +61,20 @@ curl http://10.22.2.151:5002/vol_monitor
 ```bash
 docker buildx build -f Dockerfile_ctl -t audio-ctl .
 
-docker run -d --name audio-ctl -it \
+docker run --name audio-ctl --rm -it \
 --device /dev/bus/usb:/dev/bus/usb \
--v /run/user/1000/pulse:/run/user/1000/pulse \
--e PULSE_SERVER=unix:/run/user/1000/pulse/native \
--v /var/run/docker.sock:/var/run/docker.sock \
--v /mnt/audio/audio-pro/docker-compose_services.yml:/usr/src/app/docker-compose_services.yml \
--p 5003:5003 \
+--volume /run/user/1000/pulse:/run/user/1000/pulse \
+--volume /var/run/docker.sock:/var/run/docker.sock \
+--volume /mnt/audio/audio-pro/docker-compose_services.yml:/usr/src/app/docker-compose_services.yml \
+--env PULSE_SERVER=unix:/run/user/1000/pulse/native \
+--publish 5003:5003 \
 audio-ctl python audio_control.py
 ```
 
 ```bash
-curl http://10.22.1.151:5003/audio_status
+curl http://10.22.2.151:5003/audio_status
 
-curl -X PUT http://10.22.1.151:5003/restart_services \
+curl -X PUT http://10.22.2.151:5003/restart_services \
 -H "Content-Type: application/json" \
 -d '{"limit": 32}'
 ```
@@ -86,6 +87,7 @@ LIMIT=20 docker compose -f /mnt/audio/audio-pro/docker-compose_services.yml buil
 LIMIT=20 docker compose -f /mnt/audio/audio-pro/docker-compose_services.yml up -d
 LIMIT=20 docker compose -f /mnt/audio/audio-pro/docker-compose_services.yml down
 
+docker compose -f /mnt/audio/audio-pro/docker-compose_control.yml build
 docker compose -f /mnt/audio/audio-pro/docker-compose_control.yml up -d
 docker compose -f /mnt/audio/audio-pro/docker-compose_control.yml down
 ```
