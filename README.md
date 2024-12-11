@@ -40,12 +40,16 @@ docker buildx build -f Dockerfile_vol -t audio-vol .
 
 docker run --name audio-vol --rm -it \
 -v /run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
--v /run/user/1000/pulse/native:/run/user/1000/pulse/native:rw \
--v /run/user/1000/pulse/cookie:/run/user/1000/pulse/cookie:ro \
--v /etc/localtime:/etc/localtime:ro \
--v /etc/timezone:/etc/timezone:ro \
+-v /run/user/1000/pulse/native:/run/user/1000/pulse/native \
 -p 5002:5002 \
 audio-vol bash
+
+docker run --name audio-vol --rm -it \
+--volume /run/user/$UID/pipewire-0:/run/user/$UID/pipewire-0 \
+--env PIPEWIRE_RUNTIME_DIR=/run/user/$UID/pipewire-0 \
+--env XDG_RUNTIME_DIR=/run/user/$UID \
+audio-vol bash
+
 
 ```
 ```bash
