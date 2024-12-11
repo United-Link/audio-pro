@@ -43,16 +43,19 @@ try:
         while True:
             # 等待音訊資料被回呼函數更新
             if audio_data is not None:
+                vol_max = np.max(audio_data, axis=0)
+                dbfs_max = np.maximum(20 * np.log10(vol_max), -120)
+                print(dbfs_max)
                 # 檢查形狀並處理
-                if audio_data.shape == (BLOCKSIZE, 1):
-                    print(audio_data)  # 二維陣列 (n, 1)
-                elif audio_data.shape == (BLOCKSIZE,):
-                    # print(audio_data)  # 一維陣列 (n,)
-                    vol_max = np.max(audio_data, axis=0)
-                    dbfs_max = np.maximum(20 * np.log10(vol_max), -120)
-                    print(dbfs_max)
-                else:
-                    print("音訊資料形狀錯誤:", audio_data.shape)
+                # if audio_data.shape == (BLOCKSIZE, 1):
+                #     print(audio_data[:, 0])  # 二維陣列 (n, 1)
+                # elif audio_data.shape == (BLOCKSIZE,):
+                #     # print(audio_data)  # 一維陣列 (n,)
+                #     vol_max = np.max(audio_data, axis=0)
+                #     dbfs_max = np.maximum(20 * np.log10(vol_max), -120)
+                #     print(dbfs_max)
+                # else:
+                #     print("音訊資料形狀錯誤:", audio_data.shape)
                 audio_data = None  # 清空音訊資料，等待下一次更新
             sd.sleep(int(DURATION * 1000))  # 等待一段時間，避免 CPU 使用率過高
 
