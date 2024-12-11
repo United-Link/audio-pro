@@ -4,6 +4,7 @@ import numpy as np
 # 設定音訊參數
 SAMPLE_RATE = 48000  # 取樣率
 DURATION = 0.1  # 每次擷取的音訊長度 (秒)
+BLOCKSIZE = int(SAMPLE_RATE * DURATION)  # 每次讀取的樣本數
 
 # 找到 TASCAM US-2x2 HR 的輸出裝置索引
 device_info = sd.query_devices()
@@ -26,21 +27,21 @@ def callback(outdata, frames, time, status):
 
 # 開啟音訊串流
 try:
-    with sd.InputStream(
+    with sd.RawInputStream(
         device=device_index,
-        channels=1,  # 單聲道
+        channels=1,
         samplerate=SAMPLE_RATE,
-        callback=callback,
-        blocksize=int(SAMPLE_RATE * DURATION),  # 每次擷取的樣本數
+        blocksize=BLOCKSIZE,
         dtype=np.float32,
     ) as stream:
         print("開始擷取音訊...")
         while True:
-            # 獲取音訊數據
-            audio_data = stream.read(int(SAMPLE_RATE * DURATION))[0]
-
+            # 讀取音訊資料
+            audio_data, overflow = stream.read(BLOCKSIZE)
+            if overflow:
+                print("音訊溢位!")
             # 顯示音訊值
-            print(audio_data)
+            print(audio_data[:, 0])
 
 except KeyboardInterrupt:
     print("停止擷取音訊...")
