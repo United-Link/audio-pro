@@ -28,6 +28,7 @@ audio-enh bash audio_enhance.sh 20
 
 docker run --name audio-enh --rm -it \
 -v /run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
+-e XDG_RUNTIME_DIR=/run/user/1000 \
 audio-enh bash
 ```
 
@@ -59,7 +60,7 @@ docker run -d --name audio-ctl -it \
 -v /run/user/1000/pulse:/run/user/1000/pulse \
 -e PULSE_SERVER=unix:/run/user/1000/pulse/native \
 -v /var/run/docker.sock:/var/run/docker.sock \
--v ~/audio-pro/docker-compose_services.yml:/usr/src/app/docker-compose_services.yml \
+-v /mnt/audio/audio-pro/docker-compose_services.yml:/usr/src/app/docker-compose_services.yml \
 -p 5003:5003 \
 audio-ctl python audio_control.py
 ```
@@ -76,9 +77,9 @@ curl -X PUT http://10.22.1.151:5003/restart_services \
 ## DOCKER COMPOSE
 
 ```bash
-LIMIT=20 docker compose -f ~/audio-pro/docker-compose_services.yml up -d
-LIMIT=20 docker compose -f ~/audio-pro/docker-compose_services.yml down
+LIMIT=20 docker compose -f /mnt/audio/audio-pro/docker-compose_services.yml up -d
+LIMIT=20 docker compose -f /mnt/audio/audio-pro/docker-compose_services.yml down
 
-docker compose -f ~/audio-pro/docker-compose_control.yml up -d
-docker compose -f ~/audio-pro/docker-compose_control.yml down
+docker compose -f /mnt/audio/audio-pro/docker-compose_control.yml up -d
+docker compose -f /mnt/audio/audio-pro/docker-compose_control.yml down
 ```

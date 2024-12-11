@@ -15,6 +15,7 @@ services:
           create_host_path: false
     environment:
       - XDG_RUNTIME_DIR=/run/user/1000/
+      - TZ=Asia/Taipei
     
     image: audio-enh:latest
     container_name: audio-enh
@@ -44,6 +45,9 @@ services:
         target: /run/user/1000/pipewire-0
         bind:
           create_host_path: false
+
+    environment:
+      - TZ=Asia/Taipei
 
     image: audio-vol:latest
     container_name: audio-vol

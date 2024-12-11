@@ -198,10 +198,10 @@ def restart_services():
     else:
         limit = data.get("limit", DEFAULT_LIMIT)
 
-    if not isinstance(limit, int) or limit <= 0:
+    if not isinstance(limit, int):
         response_data = {
             "status": "error",
-            "message": "Invalid limit value, must be a positive integer",
+            "message": "Invalid limit value, must be a non-negative integer",
         }
         return jsonify(response_data), 400
 

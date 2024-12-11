@@ -20,4 +20,5 @@ services:
       - /mnt/audio/audio-pro/docker-compose_services.yml:/usr/src/app/docker-compose_services.yml
     environment:
       - PULSE_SERVER=unix:/run/user/1000/pulse/native
+      - TZ=Asia/Taipei
     restart: unless-stopped
