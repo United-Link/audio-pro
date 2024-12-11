@@ -9,10 +9,8 @@ DURATION = 0.1  # 每次擷取的音訊長度 (秒)
 device_info = sd.query_devices()
 device_index = None
 for i, dev in enumerate(device_info):
-    if "TASCAM US-2x2 HR" in dev["name"] and dev["max_output_channels"] > 0:
-        if "playback_FL" in dev["name"]:
-            device_index = i
-            break
+    if "US-2x2HR" in dev["name"] and dev["max_output_channels"] > 0:
+        device_index = i
 if device_index is None:
     print("找不到 TASCAM US-2x2 HR 輸出裝置")
     exit()
