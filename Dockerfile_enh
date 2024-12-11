@@ -11,5 +11,8 @@ COPY ./ladspa/deepfilter-mono-source.conf /root/.config/pipewire/filter-chain.co
 
 COPY ./app/audio_enhance.sh .
 
+ENV XDG_RUNTIME_DIR=/run/user/1000
+ENV TZ=Asia/Taipei
+
 RUN pipewire --version
 RUN systemctl --user status pipewire || true
