@@ -39,17 +39,12 @@ bash audio_enhance.sh 20
 docker buildx build -f Dockerfile_vol -t audio-vol .
 
 docker run --name audio-vol --rm -it \
--v /run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
--v /run/user/1000/pulse/native:/run/user/1000/pulse/native \
--p 5002:5002 \
-audio-vol bash
-
-docker run --name audio-vol --rm -it \
 --volume /run/user/1000/pulse/native:/run/user/1000/pulse/native \
 --volume /run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
 --env PULSE_SERVER=unix:/run/user/1000/pulse/native \
 --env PULSE_COOKIE=/run/user/1000/pulse/cookie \
 --env XDG_RUNTIME_DIR=/run/user/1000 \
+--publish 5002:5002 \
 audio-vol bash
 
 
