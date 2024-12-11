@@ -20,26 +20,34 @@ CORS(app)
 DEVICE_NAME = "DeepFilter Noise Canceling Source"
 
 DURATION = 0.16
-SLEEP_DURATION = 0.08
-FS = 48000
+SAMPLE_RATE = 48000
 CHANNELS = 3
-REC_SAMPLES = int(DURATION * FS)
+BLOCKSIZE = int(DURATION * SAMPLE_RATE)
 
-results = {
-    "max_dbfs": {"input": "-inf", "output": "-inf"},
-    "rms_dbfs": {"input": "-inf", "output": "-inf"},
-    "status": "running",
-}
+# results = {
+#     "max_dbfs": {"input": "-inf", "output": "-inf"},
+#     "rms_dbfs": {"input": "-inf", "output": "-inf"},
+#     "status": "running",
+# }
 
 results_old = {"input_dbfs": "-inf", "output_dbfs": "-inf"}
 
 
-def get_device_index_by_name(devices, device_name):
-    for index, device in enumerate(devices):
-        if device_name in device["name"]:
-            return index
+def get_device_index(device_info, device_name):
+    for device in device_info:
+        if device_name in device["name"] and device["max_output_channels"] > 0:
+            device_index = device["index"]
+            return device_index
+    else:
+        return None
 
-    return None
+
+# 定義音訊串流的回呼函數
+def callback(indata, frames, time, status):
+    global audio_data
+    if status:
+        print(status)
+    audio_data = indata.copy()  # 將音訊資料複製到全域變數
 
 
 def inputstream_recorder(queue, device):
@@ -61,18 +69,6 @@ def inputstream_recorder(queue, device):
     ):
         while True:
             time.sleep(SLEEP_DURATION)
-
-
-def sdrec_recorder(queue, device):
-    while True:
-        recording = sd.rec(REC_SAMPLES, samplerate=FS, channels=CHANNELS, device=device)
-        sd.wait()
-
-        if not queue.full():
-            try:
-                queue.put(recording, block=False)
-            except queue.Full:
-                print("Queue (sdrec) is full.")
 
 
 def compute_dbfs(queue):
@@ -103,23 +99,48 @@ def compute_dbfs(queue):
         time.sleep(SLEEP_DURATION)
 
 
-devices = sd.query_devices()
-try:
-    device_index = get_device_index_by_name(devices, DEVICE_NAME)
-    if device_index is None:
-        raise ValueError(f"'{DEVICE_NAME}' is not found.")
-except ValueError:
-    results["status"] = "error"
-    device_index = None
+device_info = sd.query_devices()
+device_index = get_device_index(device_info, DEVICE_NAME)
+if device_index is None:
+    raise Exception(f"'{DEVICE_NAME}' is not found.")
 
-if device_index is not None:
-    queue_dfn = queue.Queue(maxsize=1)
 
-    audio_process = Thread(target=inputstream_recorder, args=(queue_dfn, device_index))
-    audio_process.start()
+with sd.InputStream(
+    device=device_index,
+    channels=4,  # 單聲道
+    samplerate=SAMPLE_RATE,
+    callback=callback,
+    blocksize=BLOCKSIZE,  # 每次擷取的樣本數
+    dtype=np.float32,
+) as stream:
+    print("開始擷取音訊...")
+    while True:
+        # 等待音訊資料被回呼函數更新
+        if audio_data is not None:
+            vol_max = np.max(audio_data, axis=0)
+            dbfs_max = np.maximum(20 * np.log10(vol_max), -120)
+            print(dbfs_max)
+            # 檢查形狀並處理
+            # if audio_data.shape == (BLOCKSIZE, 1):
+            #     print(audio_data[:, 0])  # 二維陣列 (n, 1)
+            # elif audio_data.shape == (BLOCKSIZE,):
+            #     # print(audio_data)  # 一維陣列 (n,)
+            #     vol_max = np.max(audio_data, axis=0)
+            #     dbfs_max = np.maximum(20 * np.log10(vol_max), -120)
+            #     print(dbfs_max)
+            # else:
+            #     print("音訊資料形狀錯誤:", audio_data.shape)
+            audio_data = None  # 清空音訊資料，等待下一次更新
+        sd.sleep(int(DURATION * 1000))  # 等待一段時間，避免 CPU 使用率過高
 
-    dbfs_process = Thread(target=compute_dbfs, args=(queue_dfn,))
-    dbfs_process.start()
+
+queue_dfn = queue.Queue(maxsize=1)
+
+audio_process = Thread(target=inputstream_recorder, args=(queue_dfn, device_index))
+audio_process.start()
+
+dbfs_process = Thread(target=compute_dbfs, args=(queue_dfn,))
+dbfs_process.start()
 
 
 @app.route("/vol_monitor")
