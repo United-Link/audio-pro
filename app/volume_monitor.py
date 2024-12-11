@@ -125,7 +125,7 @@ with sd.InputStream(
             results_old["output_dbfs"] = f"{dbfs_max[1]:.2f}"
 
             audio_data = None  # 清空音訊資料，等待下一次更新
-        sd.sleep(DURATION / 2)  # 等待一段時間，避免 CPU 使用率過高
+        time.sleep(DURATION / 2)  # 等待一段時間，避免 CPU 使用率過高
 
 
 # queue_dfn = queue.Queue(maxsize=1)
