@@ -3,8 +3,8 @@ name: audio_services
 services:
   audio-enh:
     build:
-      context: /mnt/audio/audio-pro
-      dockerfile: /mnt/audio/audio-pro/Dockerfile_enh
+      context: ~/audio-pro
+      dockerfile: ~/audio-pro/Dockerfile_enh
 
     restart: always
     volumes:
@@ -28,8 +28,8 @@ services:
 
   audio-vol:
     build:
-      context: /mnt/audio/audio-pro
-      dockerfile: /mnt/audio/audio-pro/Dockerfile_vol
+      context: ~/audio-pro
+      dockerfile: ~/audio-pro/Dockerfile_vol
 
     restart: always
     depends_on:
@@ -46,8 +46,8 @@ services:
         bind:
           create_host_path: false
 
-    environment:
-      - TZ=Asia/Taipei
+    # environment:
+    #   - TZ=Asia/Taipei
 
     image: audio-vol:latest
     container_name: audio-vol
