@@ -27,6 +27,7 @@ docker run --name audio-enh --rm -it \
 -v /etc/localtime:/etc/localtime:ro \
 -v /etc/timezone:/etc/timezone:ro \
 -e XDG_RUNTIME_DIR=/run/user/1000 \
+audio-enh bash
 
 bash audio_enhance.sh 20
 ```
