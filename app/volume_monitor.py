@@ -118,7 +118,7 @@ with sd.InputStream(
     while True:
         # 等待音訊資料被回呼函數更新
         if audio_data is not None:
-            vol_max = np.max(audio_data[:, [0, 2]], axis=0)
+            vol_max = np.max(audio_data[:, [2, 0]], axis=0)
             dbfs_max = np.maximum(20 * np.log10(vol_max), -120)
 
             results_old["input_dbfs"] = f"{dbfs_max[2]:.2f}"
