@@ -50,53 +50,53 @@ def callback(indata, frames, time, status):
     audio_data = indata.copy()  # 將音訊資料複製到全域變數
 
 
-def inputstream_recorder(queue, device):
-    def callback(indata, frames, time, status):
-        if status:
-            print(status)
-        if not queue.full():
-            try:
-                queue.put(indata, block=False)
-            except queue.Full:
-                print("Queue (inputstream) is full.")
+# def inputstream_recorder(queue, device):
+#     def callback(indata, frames, time, status):
+#         if status:
+#             print(status)
+#         if not queue.full():
+#             try:
+#                 queue.put(indata, block=False)
+#             except queue.Full:
+#                 print("Queue (inputstream) is full.")
 
-    with sd.InputStream(
-        samplerate=FS,
-        channels=CHANNELS,
-        device=device,
-        blocksize=REC_SAMPLES,
-        callback=callback,
-    ):
-        while True:
-            time.sleep(SLEEP_DURATION)
+#     with sd.InputStream(
+#         samplerate=FS,
+#         channels=CHANNELS,
+#         device=device,
+#         blocksize=REC_SAMPLES,
+#         callback=callback,
+#     ):
+#         while True:
+#             time.sleep(SLEEP_DURATION)
 
 
-def compute_dbfs(queue):
-    global results
-    global results_old
+# def compute_dbfs(queue):
+#     global results
+#     global results_old
 
-    while True:
-        if not queue.empty():
-            data = queue.get()
+#     while True:
+#         if not queue.empty():
+#             data = queue.get()
 
-            vol_max = np.max(data[:, [0, 2]], axis=0)
-            dbfs_max = np.maximum(20 * np.log10(vol_max), -120)
+#             vol_max = np.max(data[:, [0, 2]], axis=0)
+#             dbfs_max = np.maximum(20 * np.log10(vol_max), -120)
 
-            # vol_rms = np.sqrt(np.mean(data[:, [0, 2]] ** 2, axis=0))
-            # dbfs_rms = max(20 * np.log10(vol_rms), -120)
+#             # vol_rms = np.sqrt(np.mean(data[:, [0, 2]] ** 2, axis=0))
+#             # dbfs_rms = max(20 * np.log10(vol_rms), -120)
 
-            # results["max_dbfs"] = {
-            #     "input": f"{dbfs_max[0]:.2f}",
-            #     "output": f"{dbfs_max[1]:.2f}",
-            # }
-            # results["rms_dbfs"] = {
-            #     "input": f"{dbfs_rms[0]:.2f}",
-            #     "output": f"{dbfs_rms[1]:.2f}",
-            # }
-            results_old["input_dbfs"] = f"{dbfs_max[0]:.2f}"
-            results_old["output_dbfs"] = f"{dbfs_max[1]:.2f}"
+#             # results["max_dbfs"] = {
+#             #     "input": f"{dbfs_max[0]:.2f}",
+#             #     "output": f"{dbfs_max[1]:.2f}",
+#             # }
+#             # results["rms_dbfs"] = {
+#             #     "input": f"{dbfs_rms[0]:.2f}",
+#             #     "output": f"{dbfs_rms[1]:.2f}",
+#             # }
+#             results_old["input_dbfs"] = f"{dbfs_max[0]:.2f}"
+#             results_old["output_dbfs"] = f"{dbfs_max[1]:.2f}"
 
-        time.sleep(SLEEP_DURATION)
+#         time.sleep(SLEEP_DURATION)
 
 
 device_info = sd.query_devices()
@@ -104,6 +104,7 @@ device_index = get_device_index(device_info, DEVICE_NAME)
 if device_index is None:
     raise Exception(f"'{DEVICE_NAME}' is not found.")
 
+audio_data = None
 
 with sd.InputStream(
     device=device_index,
@@ -117,30 +118,23 @@ with sd.InputStream(
     while True:
         # 等待音訊資料被回呼函數更新
         if audio_data is not None:
-            vol_max = np.max(audio_data, axis=0)
+            vol_max = np.max(audio_data[:, [0, 2]], axis=0)
             dbfs_max = np.maximum(20 * np.log10(vol_max), -120)
-            print(dbfs_max)
-            # 檢查形狀並處理
-            # if audio_data.shape == (BLOCKSIZE, 1):
-            #     print(audio_data[:, 0])  # 二維陣列 (n, 1)
-            # elif audio_data.shape == (BLOCKSIZE,):
-            #     # print(audio_data)  # 一維陣列 (n,)
-            #     vol_max = np.max(audio_data, axis=0)
-            #     dbfs_max = np.maximum(20 * np.log10(vol_max), -120)
-            #     print(dbfs_max)
-            # else:
-            #     print("音訊資料形狀錯誤:", audio_data.shape)
+
+            results_old["input_dbfs"] = f"{dbfs_max[2]:.2f}"
+            results_old["output_dbfs"] = f"{dbfs_max[1]:.2f}"
+
             audio_data = None  # 清空音訊資料，等待下一次更新
-        sd.sleep(int(DURATION * 1000))  # 等待一段時間，避免 CPU 使用率過高
+        sd.sleep(DURATION / 2)  # 等待一段時間，避免 CPU 使用率過高
 
 
-queue_dfn = queue.Queue(maxsize=1)
+# queue_dfn = queue.Queue(maxsize=1)
 
-audio_process = Thread(target=inputstream_recorder, args=(queue_dfn, device_index))
-audio_process.start()
+# audio_process = Thread(target=inputstream_recorder, args=(queue_dfn, device_index))
+# audio_process.start()
 
-dbfs_process = Thread(target=compute_dbfs, args=(queue_dfn,))
-dbfs_process.start()
+# dbfs_process = Thread(target=compute_dbfs, args=(queue_dfn,))
+# dbfs_process.start()
 
 
 @app.route("/vol_monitor")

@@ -39,7 +39,7 @@ def callback(indata, frames, time, status):
 try:
     with sd.InputStream(
         device=device_index,
-        channels=5,  # 單聲道
+        channels=4,  # 單聲道
         samplerate=SAMPLE_RATE,
         callback=callback,
         blocksize=BLOCKSIZE,  # 每次擷取的樣本數
@@ -49,7 +49,7 @@ try:
         while True:
             # 等待音訊資料被回呼函數更新
             if audio_data is not None:
-                vol_max = np.max(audio_data, axis=0)
+                vol_max = np.max(audio_data[:, [0, 2]], axis=0)
                 dbfs_max = np.maximum(20 * np.log10(vol_max), -120)
                 print(dbfs_max)
                 # 檢查形狀並處理
