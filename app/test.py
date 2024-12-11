@@ -14,7 +14,7 @@ device_info = sd.query_devices()
 print(device_info)
 
 device_index = None
-for dev in enumerate(device_info):
+for dev in device_info:
     if DEVICE_NAME in dev["name"] and dev["max_output_channels"] > 0:
         device_index = dev["index"]
 
