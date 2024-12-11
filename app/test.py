@@ -39,7 +39,7 @@ def callback(indata, frames, time, status):
 try:
     with sd.InputStream(
         device=device_index,
-        channels=3,  # 單聲道
+        channels=4,  # 單聲道
         samplerate=SAMPLE_RATE,
         callback=callback,
         blocksize=BLOCKSIZE,  # 每次擷取的樣本數
