@@ -13,6 +13,8 @@ services:
         target: /run/user/1000/pipewire-0
         bind:
           create_host_path: false
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     environment:
       - XDG_RUNTIME_DIR=/run/user/1000/
       - TZ=Asia/Taipei
@@ -45,12 +47,14 @@ services:
         target: /run/user/1000/pipewire-0
         bind:
           create_host_path: false
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
 
     environment:
       - XDG_RUNTIME_DIR=/run/user/1000/
-      - TZ=Asia/Taipei
       - PULSE_SERVER=unix:/run/user/1000/pulse/native
       - PULSE_COOKIE=/run/user/1000/pulse/cookie
+      - TZ=Asia/Taipei
 
     image: audio-vol:latest
     container_name: audio-vol

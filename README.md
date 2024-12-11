@@ -22,15 +22,13 @@ pip install -r requirements.txt
 ```bash
 docker buildx build -f Dockerfile_enh -t audio-enh .
 
-docker run -d --name audio-enh -it \
--v /run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
-audio-enh bash audio_enhance.sh 20
-
 docker run --name audio-enh --rm -it \
 -v /run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /etc/timezone:/etc/timezone:ro \
 -e XDG_RUNTIME_DIR=/run/user/1000 \
--e TZ=Asia/Taipei \
-audio-enh bash
+
+bash audio_enhance.sh 20
 ```
 
 
