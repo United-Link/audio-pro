@@ -8,6 +8,8 @@ BLOCKSIZE = int(SAMPLE_RATE * DURATION)  # 每次讀取的樣本數
 
 # 找到 TASCAM US-2x2 HR 的輸出裝置索引
 device_info = sd.query_devices()
+print(device_info)
+
 device_index = None
 for i, dev in enumerate(device_info):
     if "US-2x2HR" in dev["name"] and dev["max_output_channels"] > 0:
@@ -33,7 +35,7 @@ def callback(indata, frames, time, status):
 try:
     with sd.InputStream(
         device=device_index,
-        channels=1,  # 單聲道
+        channels=2,  # 單聲道
         samplerate=SAMPLE_RATE,
         callback=callback,
         blocksize=BLOCKSIZE,  # 每次擷取的樣本數
