@@ -38,19 +38,14 @@ bash audio_enhance.sh 20
 ```bash
 docker buildx build -f Dockerfile_vol -t audio-vol .
 
-docker run -d --name audio-vol -it \
--v /run/user/1000/pulse/native:/run/user/1000/pulse/native:rw \
--v /run/user/1000/pulse/cookie:/run/user/1000/pulse/cookie:ro \
--v /run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
--p 5002:5002 \
-audio-vol python volume_monitor.py
-
 docker run --name audio-vol --rm -it \
 -v /run/user/1000/pulse/native:/run/user/1000/pulse/native:rw \
 -v /run/user/1000/pulse/cookie:/run/user/1000/pulse/cookie:ro \
 -v /run/user/1000/pipewire-0:/run/user/1000/pipewire-0 \
+-v /etc/localtime:/etc/localtime:ro \
+-v /etc/timezone:/etc/timezone:ro \
 -p 5002:5002 \
-audio-vol python volume_monitor.py
+audio-vol bash
 
 ```
 ```bash

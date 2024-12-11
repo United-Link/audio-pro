@@ -89,11 +89,11 @@ def compute_dbfs(queue):
         if not queue.empty():
             data = queue.get()
 
-            # vol_max = np.max(data[:, [0, 2]], axis=0)
-            # dbfs_max = 20 * np.log10(vol_max)
+            vol_max = np.max(data[:, [0, 2]], axis=0)
+            dbfs_max = max(20 * np.log10(vol_max), -120)
 
-            vol_rms = np.sqrt(np.mean(data[:, [0, 2]] ** 2, axis=0))
-            dbfs_rms = 20 * np.log10(vol_rms)
+            # vol_rms = np.sqrt(np.mean(data[:, [0, 2]] ** 2, axis=0))
+            # dbfs_rms = max(20 * np.log10(vol_rms), -120)
 
             # results["max_dbfs"] = {
             #     "input": f"{dbfs_max[0]:.2f}",
@@ -103,8 +103,8 @@ def compute_dbfs(queue):
             #     "input": f"{dbfs_rms[0]:.2f}",
             #     "output": f"{dbfs_rms[1]:.2f}",
             # }
-            results_old["input_dbfs"] = f"{dbfs_rms[0]:.2f}"
-            results_old["output_dbfs"] = f"{dbfs_rms[1]:.2f}"
+            results_old["input_dbfs"] = f"{dbfs_max[0]:.2f}"
+            results_old["output_dbfs"] = f"{dbfs_max[1]:.2f}"
 
         time.sleep(SLEEP_DURATION)
 
