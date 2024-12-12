@@ -5,6 +5,20 @@
 2. GitHub Repo 權限目前是 Public
 
 
+## Developement on NAS
+
+```bash
+ssh north@10.22.0.107
+
+cd /mnt/audio
+
+rm -rf /mnt/audio/audio-pro
+
+git clone https://github.com/United-Link/audio-pro.git
+
+```
+
+
 ## Developement Environment
 
 ```bash
