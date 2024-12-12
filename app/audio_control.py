@@ -205,10 +205,10 @@ def restart_services():
         }
         return jsonify(response_data), 400
 
-    if int(limit) < 6 or int(limit) > 100:
+    if int(limit) < 0 or int(limit) > 100:
         response_data = {
             "status": "error",
-            "message": "Limit must be between 6 and 100",
+            "message": "Limit must be between 0 and 100",
         }
         return jsonify(response_data), 400
 
