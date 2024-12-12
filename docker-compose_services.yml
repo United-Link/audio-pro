@@ -3,8 +3,8 @@ name: audio_services
 services:
   audio-enh:
     build:
-      context: /mnt/audio/audio-pro
-      dockerfile: /mnt/audio/audio-pro/Dockerfile_enh
+      context: .
+      dockerfile: ./Dockerfile_enh
 
     restart: always
     volumes:
@@ -20,7 +20,7 @@ services:
       - TZ=Asia/Taipei
       - LIMIT=${LIMIT:-20}
     
-    image: audio-enh:latest
+    image: ${DOCKER_HUB_SERVER}/${DOCKER_PROJECT}/audio-enh:${TAGVERSION}
     container_name: audio-enh
     command: ["bash", "audio_enhance.sh", "$LIMIT"]
     logging:
@@ -31,8 +31,8 @@ services:
 
   audio-vol:
     build:
-      context: /mnt/audio/audio-pro
-      dockerfile: /mnt/audio/audio-pro/Dockerfile_vol
+      context: .
+      dockerfile: ./Dockerfile_vol
 
     restart: always
     depends_on:
@@ -57,7 +57,7 @@ services:
       - PULSE_COOKIE=/run/user/1000/pulse/cookie
       - TZ=Asia/Taipei
 
-    image: audio-vol:latest
+    image: ${DOCKER_HUB_SERVER}/${DOCKER_PROJECT}/audio-vol:${TAGVERSION}
     container_name: audio-vol
     command: ["python", "volume_monitor.py"]
     logging:
